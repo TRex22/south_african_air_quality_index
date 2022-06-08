@@ -27,7 +27,7 @@ Or install it yourself as:
   client  = SouthAfricanAirQualityIndex::Client.new
 
   # To list stations and available monitors:
-  client.stations()
+  client.stations
 
   # To get a report from one stations
   client.station_report(...)

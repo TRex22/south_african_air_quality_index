@@ -1,31 +1,10 @@
 module SouthAfricanAirQualityIndex
   class Client
     include ::SouthAfricanAirQualityIndex::Constants
-    include ::SouthAfricanAirQualityIndex::Community
 
-    # TODO: Air quality guidelines
-    # TODO: Units breakdown
-    # TODO: Return codes
-    # https://api-docs.iqair.com/?version=latest
-    # Below are a few example of return codes you may get. This list is not exhaustive.
-    # success: returned when JSON file was generated successfully.
-    # call_limit_reached: returned when minute/monthly limit is reached.
-    # api_key_expired: returned when API key is expired.
-    # incorrect_api_key: returned when using wrong API key.
-    # ip_location_failed: returned when service is unable to locate IP address of request.
-    # no_nearest_station: returned when there is no nearest station within specified radius.
-    # feature_not_available: returned when call requests a feature that is not available in chosen subscription plan.
-    # too_many_requests: returned when more than 10 calls per second are made.
+    attr_reader :base_path, :port
 
-    attr_reader :api_key,
-      :base_path,
-      :port,
-      :login_response,
-      :raw_cookie,
-      :expiry
-
-    def initialize(api_key:, base_path: BASE_PATH, port: 80)
-      @api_key = api_key
+    def initialize(base_path: BASE_PATH, port: 80)
       @base_path = base_path
       @port = port
     end
@@ -39,11 +18,26 @@ module SouthAfricanAirQualityIndex
       'v1 2022-06-08'
     end
 
+    # Endpoints
+    def stations
+      send(http_method: :get, path: 'ajax/getAllStationsNew')
+    end
+
+    def selected_stations(station_names)
+
+    end
+
+    def station_report()
+
+    end
+
+    def multi_station_report()
+
+    end
+
     private
 
-    def authorise_and_send(http_method:, path:, payload: {}, params: {})
-      params.merge!({ key: api_key })
-
+    def send(http_method:, path:, payload: {}, params: {})
       start_time = micro_second_time
 
       response = HTTParty.send(
@@ -89,6 +83,12 @@ module SouthAfricanAirQualityIndex
       else
         "#{constructed_path}?#{process_params(params)}"
       end
+    end
+
+    def parse_body(response, path)
+      JSON.parse(response.body) # Purposely not using HTTParty
+    rescue JSON::ParserError => _e
+      response.body
     end
 
     def process_params(params)

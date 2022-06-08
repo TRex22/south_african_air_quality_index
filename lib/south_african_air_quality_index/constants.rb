@@ -1,7 +1,6 @@
 module SouthAfricanAirQualityIndex
   module Constants
-    BASE_PATH = 'https://api.airvisual.com/v2'
-    IMAGES_PATH = 'https://airvisual.com/images/'
+    BASE_PATH = 'https://saaqis.environment.gov.za'
 
     # https://api-docs.iqair.com/?version=latest#important-notes
     # https://www.airnow.gov/aqi/aqi-basics/
