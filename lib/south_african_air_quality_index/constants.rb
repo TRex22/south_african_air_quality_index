@@ -2,6 +2,11 @@ module SouthAfricanAirQualityIndex
   module Constants
     BASE_PATH = 'https://saaqis.environment.gov.za'
 
+    DEFAULT_INTERVAL = 60
+    STATION_REPORT = 'station report'.freeze
+    HOURLY_REPORT = 'hourly report'.freeze
+    REPORT_TYPE = 'Average'.freeze
+
     # https://api-docs.iqair.com/?version=latest#important-notes
     # https://www.airnow.gov/aqi/aqi-basics/
     # https://www.weather.gov/safety/airquality-aqindex

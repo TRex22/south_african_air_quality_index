@@ -30,14 +30,34 @@ Or install it yourself as:
   client.stations
 
   # To get the correct list of info for reports
-  station_names = ["City of Johannesburg", "City of Ekurhuleni", "City of Cape Town"]
+  station_names = ['City of Johannesburg', 'City of Ekurhuleni', 'City of Cape Town']
   client.selected_stations(station_names, build_for_response: true)
 
   # To get a report from one stations
-  client.station_report(...)
+  # Some defaults that are used:
+  # interval: DEFAULT_INTERVAL (60)
+  # report_type: REPORT_TYPE (average)
+  #
+  # station_name - will do a best match to the name
+  # start_date - can be a Time, DateTime or string 30/01/2022 00:00
+  # end_date - can be a Time, DateTime or string 30/01/2022 00:00
+  station_name = 'City of Ekurhuleni'
+  start_date = Time.now - (60 * 60)
+  end_date = Time.now
+  client.station_report(station_name, start_date, end_date)
 
   # To get a report from multiple stations at once
-  client.multi_station_report(...)
+  # Some defaults that are used:
+  # interval: DEFAULT_INTERVAL (60)
+  # report_type: REPORT_TYPE (average)
+  #
+  # station_names - will do a best match to the name
+  # start_date - can be a Time, DateTime or string 30/01/2022 00:00
+  # end_date - can be a Time, DateTime or string 30/01/2022 00:00
+  station_names = ['City of Johannesburg', 'City of Ekurhuleni', 'City of Cape Town']
+  start_date = Time.now - (60 * 60)
+  end_date = Time.now
+  client.multi_station_report(station_names, start_date, end_date)
 ```
 
 ### Endpoints

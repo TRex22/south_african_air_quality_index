@@ -2,7 +2,7 @@ module SouthAfricanAirQualityIndex
   class Client
     include ::SouthAfricanAirQualityIndex::Constants
 
-    attr_reader :base_path, :port
+    attr_reader :base_path, :port, :stations
 
     def initialize(base_path: BASE_PATH, port: 80)
       @base_path = base_path
@@ -19,42 +19,86 @@ module SouthAfricanAirQualityIndex
     end
 
     # Endpoints
+
+    # Memoize stations as they are unlikely to change often
     def stations
-      send(http_method: :get, path: 'ajax/getAllStationsNew')
+      @stations ||= send(http_method: :get, path: 'ajax/getAllStationsNew')
     end
 
-    def selected_stations(station_names, build_for_response: false)
-      raw_station_info = stations
-      stations = raw_station_info['body']['Stations']
-        .select { |station| station_matches?(station_names, station) }
+    def stations_from_code(codes, build_for_response: false)
+      stations['body']['Stations'].select do |station|
+        codes.map(&:to_s).include?(station["serialCode"].to_s)
+      end
+    end
 
-      # build_for_response will create an array of tuples to be used in the body
-      # of requests to generate reports
-      return stations unless build_for_response
+    def selected_stations(station_names)
+      stations['body']['Stations'].select do |station|
+        station_matches?(station_names, station)
+      end
+    end
 
-      stations.map { |station|
+    def station_report(station_name, start_date, end_date, interval: DEFAULT_INTERVAL, report_type: REPORT_TYPE)
+      station = selected_stations([station_name]).first
+      return if station.empty?
 
+      monitor_ids = fetch_monitor_ids(station)
+
+      body = {
+        "StationId": station['serialCode'],
+        "MonitorsChannels": monitor_ids,
+        "reportName": STATION_REPORT,
+        "startDateAbsolute": start_date.to_s,
+        "endDateAbsolute": end_date.to_s,
+        "startDate": start_date.to_s,
+        "endDate": end_date.to_s,
+        "reportType": report_type,
+        "fromTb": 60,
+        "toTb": 60
+      }.to_json
+
+      send(http_method: :get, path: 'report/GetStationReportData', body: body, params: { 'InPopUp': false })
+    end
+
+    def multi_station_report(station_names, start_date, end_date, interval: DEFAULT_INTERVAL, report_type: REPORT_TYPE)
+      extracted_stations = selected_stations(station_names)
+
+      monitor_channels_by_station_id = extracted_stations.map { |station|
+        [station['serialCode'].to_s, fetch_monitor_ids(station)]
+      }.to_h
+
+      body = {
+        "monitorChannelsByStationId": monitor_channels_by_station_id,
+        "reportName": HOURLY_REPORT,
+        "startDateAbsolute": start_date.to_s,
+        "endDateAbsolute": end_date.to_s,
+        "startDate": "/Date(#{Time.parse(start_date.to_s).to_i})/",
+        "endDate": "/Date(#{Time.parse(end_date.to_s).to_i})/",
+        "reportType": REPORT_TYPE,
+        "fromTb": DEFAULT_INTERVAL,
+        "toTb": DEFAULT_INTERVAL
       }
-      # binding.pry
-    end
 
-    def station_report()
+      monitor_channels_by_station_id.each.with_index do |pair, index|
+        hsh = {
+          "monitorChannelsByStationId[#{index}].Key": pair[0],
+          "monitorChannelsByStationId[#{index}].Value": pair[1]
+        }
 
-    end
+        body = body.merge(hsh)
+      end
 
-    def multi_station_report()
-
+      send(http_method: :get, path: 'report/GetMultiStationReportData', body: body.to_json)
     end
 
     private
 
-    def send(http_method:, path:, payload: {}, params: {})
+    def send(http_method:, path:, body: {}, params: {})
       start_time = micro_second_time
 
       response = HTTParty.send(
         http_method.to_sym,
         construct_base_path(path, params),
-        body: payload,
+        body: body,
         headers: { 'Content-Type': 'application/json' },
         port: port,
         format: :json
@@ -110,16 +154,24 @@ module SouthAfricanAirQualityIndex
       station_names
         .compact
         .any? do |station_name|
-          station['DisplayName'].downcase == process_station(station_name) ||
-            station['name'].downcase == process_station(station_name) ||
-            station['city'].downcase == process_station(station_name) ||
-            station['owner'].downcase == process_station(station_name) ||
-            station['owner'].downcase == process_station(station_name) # TODO: Each monitor has a name too
+          processed_name = process_station(station_name)
+
+          process_station(station['city']) == processed_name ||
+            process_station(station['DisplayName']) == processed_name ||
+            process_station(station['name']) == processed_name ||
+            process_station(station['owner']) == processed_name ||
+            process_station(station['location']) == processed_name # TODO: Each monitor has a name too
         end
     end
 
+    def fetch_monitor_ids(station)
+      station['monitors'].map do |monitor|
+        monitor['channel']
+      end
+    end
+
     def process_station(name)
-      name.downcase.gsub('  ', '')
+      name.downcase.gsub('  ', ' ')
     end
   end
 end
