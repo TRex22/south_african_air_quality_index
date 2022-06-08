@@ -1,0 +1,176 @@
+https://aqicn.org/city/south-africa/ekurhuleni/bedfordview/
+https://saaqis.environment.gov.za/
+
+https://saaqis.environment.gov.zacurl 'https://saaqis.environment.gov.za/report/MultiStationTable' \ -H 'authority: saaqis.environment.gov.za' \ -H 'accept: */*' \ -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \ -H 'content-type: application/json; charset=UTF-8' \ -H 'cookie: ASP.NET_SessionId=z4v3us4hod3anuee0cpv0sn4' \ -H 'dnt: 1' \ -H 'origin: https://saaqis.environment.gov.za' \ -H 'referer: https://saaqis.environment.gov.za/' \ -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"' \ -H 'sec-ch-ua-mobile: ?0' \ -H 'sec-ch-ua-platform: "macOS"' \ -H 'sec-fetch-dest: empty' \ -H 'sec-fetch-mode: cors' \ -H 'sec-fetch-site: same-origin' \ -H 'sec-gpc: 1' \ -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36' \ -H 'x-requested-with: XMLHttpRequest' \ --data-raw '{"reportConfig":{"reportName":"hourly report","reportType":"Average","startDate":"08/06/2022 01:00","endDate":"09/06/2022 00:00","startDateAbsolute":"08/06/2022 01:00","endDateAbsolute":"09/06/2022 00:00","fromTb":60,"toTb":60,"monitorChannelsByStationId[0].Key":"34","monitorChannelsByStationId[0].Value":[30,28,27,25,23,11,6,3,2,4,5,14,9,8,7,31,35,1,29,12],"monitorChannelsByStationId[1].Key":"93","monitorChannelsByStationId[1].Value":[30,28,27,25,23,11,6,15,3,2,4,5,14,8,7,31,35,1,29,12,13],"monitorChannelsByStationId[2].Key":"161","monitorChannelsByStationId[2].Value":[28,27,25,23,11,14,31,35,1,29,12,26],"monitorChannelsByStationId[3].Key":"168","monitorChannelsByStationId[3].Value":[30,28,27,25,23,29]},"InPopUp":true,"isSummaryOnBottomTable":true}' \ --compressed
+
+# Single Station
+curl 'https://saaqis.environment.gov.za/report/GetStationReportData' \
+  -H 'authority: saaqis.environment.gov.za' \
+  -H 'accept: */*' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'content-type: application/json; charset=UTF-8' \
+  -H 'cookie: ASP.NET_SessionId=z4v3us4hod3anuee0cpv0sn4' \
+  -H 'dnt: 1' \
+  -H 'origin: https://saaqis.environment.gov.za' \
+  -H 'referer: https://saaqis.environment.gov.za/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-gpc: 1' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw '{"StationId":168,"MonitorsChannels":[23,25,27,28,29,30],"reportName":"station report","startDateAbsolute":"08/06/2022 00:01","endDateAbsolute":"09/06/2022 00:00","startDate":"08/06/2022 00:01","endDate":"09/06/2022 23:01","reportType":"Average","fromTb":60,"toTb":60}' \
+  --compressed
+
+# Hourly reports info
+https://saaqis.environment.gov.za/Report/HourlyReports?InPopUp=True
+
+curl 'https://saaqis.environment.gov.za/Report/HourlyReports?InPopUp=True' \
+  -H 'authority: saaqis.environment.gov.za' \
+  -H 'accept: */*' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'cookie: ASP.NET_SessionId=z4v3us4hod3anuee0cpv0sn4' \
+  -H 'dnt: 1' \
+  -H 'referer: https://saaqis.environment.gov.za/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-gpc: 1' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --compressed
+
+# Returns HTML with names etc ...
+require 'httparty'
+response = HTTParty.get('https://saaqis.environment.gov.za/Report/HourlyReports?InPopUp=False', headers: {'Content-Type' => 'application/json'});
+
+response.body.split("\r\n").select { |row| row.include?("let")}
+
+region_info = response.body.split("\r\n").select { |row| row.include?("let m_Regions =")}.first.delete!(';').delete!("        let m_Regions =").gsub('ru,', '"ru",').gsub('u,', '"u",').gsub('u}', '"u"}').gsub('fa,', '"fa",');
+ru
+
+puts region_info
+JSON.parse(region_info)
+
+# Multi Station Table (not useful)
+curl 'https://saaqis.environment.gov.za/report/MultiStationTable' \
+  -H 'authority: saaqis.environment.gov.za' \
+  -H 'accept: */*' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'content-type: application/json; charset=UTF-8' \
+  -H 'cookie: ASP.NET_SessionId=z4v3us4hod3anuee0cpv0sn4' \
+  -H 'dnt: 1' \
+  -H 'origin: https://saaqis.environment.gov.za' \
+  -H 'referer: https://saaqis.environment.gov.za/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-gpc: 1' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw '{"reportConfig":{"reportName":"hourly report","reportType":"Average","startDate":"08/06/2022 01:00","endDate":"09/06/2022 00:00","startDateAbsolute":"08/06/2022 01:00","endDateAbsolute":"09/06/2022 00:00","fromTb":60,"toTb":60,"monitorChannelsByStationId[0].Key":"34","monitorChannelsByStationId[0].Value":[30,28,27,25,23,11,6,3,2,4,5,14,9,8,7,31,35,1,29,12],"monitorChannelsByStationId[1].Key":"93","monitorChannelsByStationId[1].Value":[30,28,27,25,23,11,6,15,3,2,4,5,14,8,7,31,35,1,29,12,13],"monitorChannelsByStationId[2].Key":"161","monitorChannelsByStationId[2].Value":[28,27,25,23,11,14,31,35,1,29,12,26],"monitorChannelsByStationId[3].Key":"168","monitorChannelsByStationId[3].Value":[30,28,27,25,23,29]},"InPopUp":true,"isSummaryOnBottomTable":true}' \
+  --compressed
+
+require 'httparty'
+response = HTTParty.get('https://saaqis.environment.gov.za/report/MultiStationTable', headers: {'Content-Type' => 'application/json'});
+
+# Multi Station report Data
+curl 'https://saaqis.environment.gov.za/report/GetMultiStationReportData' \
+  -H 'authority: saaqis.environment.gov.za' \
+  -H 'accept: */*' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'content-type: application/json; charset=UTF-8' \
+  -H 'cookie: ASP.NET_SessionId=z4v3us4hod3anuee0cpv0sn4' \
+  -H 'dnt: 1' \
+  -H 'origin: https://saaqis.environment.gov.za' \
+  -H 'referer: https://saaqis.environment.gov.za/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-gpc: 1' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw '{"monitorChannelsByStationId":{"34":[30,28,27,25,23,11,6,3,2,4,5,14,9,8,7,31,35,1,29,12],"93":[30,28,27,25,23,11,6,15,3,2,4,5,14,8,7,31,35,1,29,12,13],"161":[28,27,25,23,11,14,31,35,1,29,12,26],"168":[30,28,27,25,23,29]},"reportName":"hourly report","startDateAbsolute":"08/06/2022 01:00","endDateAbsolute":"09/06/2022 00:00","startDate":"08/06/2022 01:00","endDate":"10/06/2022 00:00","reportType":"Average","fromTb":60,"toTb":60,"monitorChannelsByStationId[0].Key":"34","monitorChannelsByStationId[0].Value":[30,28,27,25,23,11,6,3,2,4,5,14,9,8,7,31,35,1,29,12],"monitorChannelsByStationId[1].Key":"93","monitorChannelsByStationId[1].Value":[30,28,27,25,23,11,6,15,3,2,4,5,14,8,7,31,35,1,29,12,13],"monitorChannelsByStationId[2].Key":"161","monitorChannelsByStationId[2].Value":[28,27,25,23,11,14,31,35,1,29,12,26],"monitorChannelsByStationId[3].Key":"168","monitorChannelsByStationId[3].Value":[30,28,27,25,23,29]}' \
+  --compressed
+
+# List Stations
+curl 'https://saaqis.environment.gov.za/ajax/getAllStationsNew?_=1654684287297' \
+  -H 'authority: saaqis.environment.gov.za' \
+  -H 'accept: */*' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'cookie: ASP.NET_SessionId=z4v3us4hod3anuee0cpv0sn4' \
+  -H 'dnt: 1' \
+  -H 'referer: https://saaqis.environment.gov.za/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-gpc: 1' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --compressed
+
+require 'httparty'
+response2 = HTTParty.get('https://saaqis.environment.gov.za/ajax/getAllStationsNew', headers: {'Content-Type' => 'application/json'});
+
+stations = JSON.parse(response2.body);
+stations["Irregularity"].size
+stations["Stations"].size
+
+r = stations["Stations"].first
+stations["Stations"].map { |r| r.size }
+
+
+# Multi stations report summary
+curl 'https://saaqis.environment.gov.za/report/GetMultiStationReportSummary' \
+  -H 'authority: saaqis.environment.gov.za' \
+  -H 'accept: */*' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
+  -H 'content-type: application/json; charset=UTF-8' \
+  -H 'cookie: ASP.NET_SessionId=z4v3us4hod3anuee0cpv0sn4' \
+  -H 'dnt: 1' \
+  -H 'origin: https://saaqis.environment.gov.za' \
+  -H 'referer: https://saaqis.environment.gov.za/' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-gpc: 1' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw '{"monitorChannelsByStationId":{"34":[30,28,27,25,23,11,6,3,2,4,5,14,9,8,7,31,35,1,29,12],"93":[30,28,27,25,23,11,6,15,3,2,4,5,14,8,7,31,35,1,29,12,13],"161":[28,27,25,23,11,14,31,35,1,29,12,26],"168":[30,28,27,25,23,29]},"reportName":"hourly report","startDateAbsolute":"08/06/2022 01:00","endDateAbsolute":"09/06/2022 00:00","startDate":"/Date(1654642800000)/","endDate":"/Date(1654725600000)/","reportType":"Average","fromTb":60,"toTb":60,"monitorChannelsByStationId[0].Key":"34","monitorChannelsByStationId[0].Value":[30,28,27,25,23,11,6,3,2,4,5,14,9,8,7,31,35,1,29,12],"monitorChannelsByStationId[1].Key":"93","monitorChannelsByStationId[1].Value":[30,28,27,25,23,11,6,15,3,2,4,5,14,8,7,31,35,1,29,12,13],"monitorChannelsByStationId[2].Key":"161","monitorChannelsByStationId[2].Value":[28,27,25,23,11,14,31,35,1,29,12,26],"monitorChannelsByStationId[3].Key":"168","monitorChannelsByStationId[3].Value":[30,28,27,25,23,29]}' \
+  --compressed
+
+require 'httparty'
+
+body = '{"monitorChannelsByStationId":{"34":[30,28,27,25,23,11,6,3,2,4,5,14,9,8,7,31,35,1,29,12],"93":[30,28,27,25,23,11,6,15,3,2,4,5,14,8,7,31,35,1,29,12,13],"161":[28,27,25,23,11,14,31,35,1,29,12,26],"168":[30,28,27,25,23,29]},"reportName":"hourly report","startDateAbsolute":"08/06/2022 01:00","endDateAbsolute":"09/06/2022 00:00","startDate":"/Date(1654642800000)/","endDate":"/Date(1654725600000)/","reportType":"Average","fromTb":60,"toTb":60,"monitorChannelsByStationId[0].Key":"34","monitorChannelsByStationId[0].Value":[30,28,27,25,23,11,6,3,2,4,5,14,9,8,7,31,35,1,29,12],"monitorChannelsByStationId[1].Key":"93","monitorChannelsByStationId[1].Value":[30,28,27,25,23,11,6,15,3,2,4,5,14,8,7,31,35,1,29,12,13],"monitorChannelsByStationId[2].Key":"161","monitorChannelsByStationId[2].Value":[28,27,25,23,11,14,31,35,1,29,12,26],"monitorChannelsByStationId[3].Key":"168","monitorChannelsByStationId[3].Value":[30,28,27,25,23,29]}'
+
+response = HTTParty.get('https://saaqis.environment.gov.za/report/GetMultiStationReportData', body: JSON.parse(body).to_json, headers: {'Content-Type' => 'application/json'});
+
+
+Types of SA Air Quality reports
+- Analyze single station
+- Analyse multi station
+- Analyse Multiple Params
+- Hourly monitoring data (Multiple stations, time ranges and multiple sensors)
+- Wind / Pollution Roses (Wind direct and pollution graphs)
+- Index Report (AQI)
+- Matrix Report (1 station 1 metric gives stats)
+
+
