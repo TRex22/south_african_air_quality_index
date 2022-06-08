@@ -29,6 +29,10 @@ Or install it yourself as:
   # To list stations and available monitors:
   client.stations
 
+  # To get the correct list of info for reports
+  station_names = ["City of Johannesburg", "City of Ekurhuleni", "City of Cape Town"]
+  client.selected_stations(station_names, build_for_response: true)
+
   # To get a report from one stations
   client.station_report(...)
 

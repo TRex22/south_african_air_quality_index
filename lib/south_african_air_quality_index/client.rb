@@ -23,8 +23,19 @@ module SouthAfricanAirQualityIndex
       send(http_method: :get, path: 'ajax/getAllStationsNew')
     end
 
-    def selected_stations(station_names)
+    def selected_stations(station_names, build_for_response: false)
+      raw_station_info = stations
+      stations = raw_station_info['body']['Stations']
+        .select { |station| station_matches?(station_names, station) }
 
+      # build_for_response will create an array of tuples to be used in the body
+      # of requests to generate reports
+      return stations unless build_for_response
+
+      stations.map { |station|
+
+      }
+      # binding.pry
     end
 
     def station_report()
@@ -93,6 +104,22 @@ module SouthAfricanAirQualityIndex
 
     def process_params(params)
       params.keys.map { |key| "#{key}=#{params[key]}" }.join('&')
+    end
+
+    def station_matches?(station_names, station)
+      station_names
+        .compact
+        .any? do |station_name|
+          station['DisplayName'].downcase == process_station(station_name) ||
+            station['name'].downcase == process_station(station_name) ||
+            station['city'].downcase == process_station(station_name) ||
+            station['owner'].downcase == process_station(station_name) ||
+            station['owner'].downcase == process_station(station_name) # TODO: Each monitor has a name too
+        end
+    end
+
+    def process_station(name)
+      name.downcase.gsub('  ', '')
     end
   end
 end
