@@ -15,14 +15,15 @@ module SouthAfricanAirQualityIndex
 
     # This is the version of the API docs this client was built off-of
     def self.api_version
-      'v1 2022-06-08'
+      'v1 2022-12-15'
     end
 
     # Endpoints
 
     # Memoize stations as they are unlikely to change often
     def stations
-      @stations ||= send(http_method: :get, path: 'ajax/getAllStationsNew')
+      # This endpoint is no longer active:
+      @stations ||= send(http_method: :get, path: 'ajax/getAllStations')
     end
 
     def stations_from_code(codes, build_for_response: false)
@@ -32,7 +33,7 @@ module SouthAfricanAirQualityIndex
     end
 
     def selected_stations(station_names)
-      stations['body']['Stations'].select do |station|
+      stations['body'].select do |station|
         station_matches?(station_names, station)
       end
     end
@@ -156,7 +157,8 @@ module SouthAfricanAirQualityIndex
         .any? do |station_name|
           processed_name = process_station(station_name)
 
-          process_station(station['city']) == processed_name ||
+          process_station(station['ShortName']) == processed_name ||
+            process_station(station['city']) == processed_name ||
             process_station(station['DisplayName']) == processed_name ||
             process_station(station['name']) == processed_name ||
             process_station(station['owner']) == processed_name ||
@@ -171,7 +173,7 @@ module SouthAfricanAirQualityIndex
     end
 
     def process_station(name)
-      name.downcase.gsub('  ', ' ')
+      name.to_s.downcase.gsub('  ', ' ')
     end
   end
 end
