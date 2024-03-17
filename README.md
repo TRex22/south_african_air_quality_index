@@ -46,7 +46,7 @@ Or install it yourself as:
   end_date = Time.now
   client.station_report(station_name, start_date, end_date)
 
-  # To get a report from multiple stations at once
+  # To get a report from multiple stations at once (HTML is returned for now)
   # Some defaults that are used:
   # interval: DEFAULT_INTERVAL (60)
   # report_type: REPORT_TYPE (average)

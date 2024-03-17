@@ -71,28 +71,27 @@ module SouthAfricanAirQualityIndex
       end
     end
 
-    # This has been deprecated:
-    # def station_report(station_name, start_date, end_date, interval: DEFAULT_INTERVAL, report_type: REPORT_TYPE)
-    #   station = selected_stations([station_name]).first
-    #   return if station.empty?
+    def station_report(station_name, start_date, end_date, interval: DEFAULT_INTERVAL, report_type: REPORT_TYPE, precent_valid: DEFAULT_PERCENT_VALID)
+      station = selected_stations([station_name]).first
+      return if station.empty?
 
-    #   monitor_ids = fetch_monitor_ids(station)
+      params = {
+        filterChannels: fetch_monitor_ids(station),
+        from: parse_time(start_date.to_s),
+        to: parse_time(end_date.to_s),
+        fromTimebase: interval,
+        toTimebase: interval,
+        precentValid: precent_valid,
+        timeBeginning: false,
+        useBackWard: true,
+        unitConversion: false,
+        includeSummary: true,
+        onlySummary: false,
+      }
 
-    #   body = {
-    #     "StationId": station['stationId'],
-    #     "MonitorsChannels": monitor_ids,
-    #     "reportName": STATION_REPORT,
-    #     "startDateAbsolute": start_date.to_s,
-    #     "endDateAbsolute": end_date.to_s,
-    #     "startDate": start_date.to_s,
-    #     "endDate": end_date.to_s,
-    #     "reportType": report_type,
-    #     "fromTb": 60,
-    #     "toTb": 60
-    #   }.to_json
-
-    #   send_request(http_method: :get, path: 'report/GetStationReportData', body: body, params: { 'InPopUp': false })
-    # end
+      path = "v1/envista/stations/#{station['stationId']}/#{report_type}"
+      send_request(http_method: :get, path: path, params: params, port: DATA_SOURCE_PORT, port_in_path: true)
+    end
 
     # This now will only return HTML
     # TODO: Parse the HTML
@@ -126,28 +125,6 @@ module SouthAfricanAirQualityIndex
       end
 
       send_request(http_method: :get, path: 'report/MultiStationTable', body: body.to_json)
-    end
-
-    def station_average_report(station_name, start_date, end_date, interval: DEFAULT_INTERVAL, report_type: REPORT_TYPE, precent_valid: DEFAULT_PERCENT_VALID)
-      station = selected_stations([station_name]).first
-      return if station.empty?
-
-      params = {
-        filterChannels: fetch_monitor_ids(station),
-        from: parse_time(start_date.to_s),
-        to: parse_time(end_date.to_s),
-        fromTimebase: interval,
-        toTimebase: interval,
-        precentValid: precent_valid,
-        timeBeginning: false,
-        useBackWard: true,
-        unitConversion: false,
-        includeSummary: true,
-        onlySummary: false,
-      }
-
-      path = "v1/envista/stations/#{station['stationId']}/#{report_type}"
-      send_request(http_method: :get, path: path, params: params, port: DATA_SOURCE_PORT, port_in_path: true)
     end
 
     private
