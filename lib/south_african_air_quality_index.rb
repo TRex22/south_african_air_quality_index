@@ -1,4 +1,6 @@
 require 'httparty'
+# require 'jwt'
+require 'nokogiri'
 
 require 'south_african_air_quality_index/constants'
 require 'south_african_air_quality_index/version'

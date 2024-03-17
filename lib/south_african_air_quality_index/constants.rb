@@ -1,8 +1,13 @@
 module SouthAfricanAirQualityIndex
   module Constants
-    BASE_PATH = 'https://saaqis.environment.gov.za'
+    BASE_URI = 'saaqis.environment.gov.za'
+    BASE_PATH = "https://#{BASE_URI}"
+
+    BASE_PORT = 443
+    DATA_SOURCE_PORT = 44301
 
     DEFAULT_INTERVAL = 60
+    DEFAULT_PERCENT_VALID = 75
     STATION_REPORT = 'station report'.freeze
     HOURLY_REPORT = 'hourly report'.freeze
     REPORT_TYPE = 'Average'.freeze
