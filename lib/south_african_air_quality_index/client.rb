@@ -86,7 +86,7 @@ module SouthAfricanAirQualityIndex
         useBackWard: true,
         unitConversion: false,
         includeSummary: true,
-        onlySummary: false,
+        onlySummary: false, # TODO: Parameter?
       }
 
       path = "v1/envista/stations/#{station['stationId']}/#{report_type}"
@@ -197,6 +197,8 @@ module SouthAfricanAirQualityIndex
       JSON.parse(response.body) # Purposely not using HTTParty
     rescue JSON::ParserError => _e
       response.body
+    rescue TypeError => _e
+      nil
     end
 
     def process_params(params)
