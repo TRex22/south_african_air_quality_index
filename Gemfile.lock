@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    south_african_air_quality_index (0.0.6)
-      active_attr (~> 0.17.0)
-      httparty (~> 0.22.0)
-      nokogiri (~> 1.16.7)
+    south_african_air_quality_index (0.0.7)
+      active_attr (>= 0.17.0)
+      httparty (>= 0.22.0)
+      nokogiri (>= 1.16.7)
 
 GEM
   remote: https://rubygems.org/
@@ -122,4 +122,4 @@ DEPENDENCIES
   webmock (~> 3.23.1)
 
 BUNDLED WITH
-   2.5.17
+   2.7.1
