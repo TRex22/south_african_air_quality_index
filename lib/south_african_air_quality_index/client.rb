@@ -2,11 +2,12 @@ module SouthAfricanAirQualityIndex
   class Client
     include ::SouthAfricanAirQualityIndex::Constants
 
-    attr_reader :base_path, :port, :stations
+    attr_reader :base_path, :port, :stations, :verify_ssl
 
-    def initialize(base_path: BASE_PATH, port: BASE_PORT)
+    def initialize(base_path: BASE_PATH, port: BASE_PORT, verify_ssl: true)
       @base_path = base_path
       @port = port
+      @verify_ssl = verify_ssl
       @cookie = authorise
     end
 
@@ -140,7 +141,8 @@ module SouthAfricanAirQualityIndex
         body: body,
         headers: headers.merge({ 'Content-Type': 'application/json' }),
         port: port,
-        format: :json
+        format: :json,
+        verify: @verify_ssl
       )
 
       end_time = micro_second_time
